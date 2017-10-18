@@ -1,0 +1,214 @@
+---
+title: "Workouts"
+author: "Kayla Catalfamo"
+date: '`r Sys.Date()`'
+output:
+  pdf_document: default
+  html_document: default
+vignette: |
+  %\VignetteIndexEntry{Vignette Title} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+---
+
+### Description
+This dataset was made based on my active weekly workouts. The workouts occurred four - five times a week focusing on different body parts of the body. Every workout had four sets containing ten reps. Each rep may have contained different weights (lbs) due to the fact that I like to increase the weight with each rep. So the weight (lbs) that were recorded in the dataset is the average weights used overall in each workout. The variables of the dataset are as followed;
+  
+    Day - "The actual date that the workout was performed"
+    Week - "The week # in the year"
+    Workout Day - "What body category was focused on"
+    # of Workouts - "The amount of different exercises that were done" 
+    Cardio - "Total number of calories that are burned in a cardio session" (calories)
+    Weight - "The amount of pounds I weighed for that day" (lbs)
+    
+The other variables are the types of exercises that were done at each workout day. 
+
+The main focus of this research is calculating my body fat percentage. As the semester continues, my weight should be changing whether its increasing or decreasing. In reality my weight will be increasing due to the increase of the amount of weight that will be used over time. The reason why my weight should be increasing is because muscle weighs more than fat, so as I gained more muscle I will weigh more. This can sometimes be stressful because seeing the number on the scale is intimidating and discouraging. That's why with this research I'm not worried about tracking the change in my weight, but in my body fat percentage. Since I already know my weight will be increasing, the outcome of this research is to see the possible decrease in body fat percentage. 
+
+### Reading in the Data
+```{r, include=FALSE}
+
+getwd()
+rm(list=objects())
+
+```
+
+
+The packages that are required to run the code and functions are;
+
+    "googlesheets"
+    "devtools"
+    "plyr"
+    "reshape2"
+    "ggplot2"
+    
+```{r, include=FALSE}
+
+library(googlesheets)
+library(devtools)
+library(plyr)
+library(reshape2)
+library(ggplot2)
+library(tidyverse)
+
+
+```
+
+
+This grouping of r code will run the data into R from the google drive and make it a data frame. 
+```{r, message = FALSE}
+
+
+gs_url(
+  "https://docs.google.com/spreadsheets/d/1L-x70T_CIqXSrGIB8GN-MsVTpljni_xuOSj47OHuSHE/edit?usp=sharing",
+  lookup = NULL, visibility = NULL, verbose = TRUE 
+)
+workout <- gs_title("Workouts")
+workouts <- gs_read(ss=workout, wo = "Workouts for Each Day", header = T)
+workouts <- as.data.frame(workouts)
+
+
+```
+
+
+#### Extra Coding
+
+This section sets up coding to revise the dataframe in the meantime while more data is being collected throughout the weeks. Descriptions of what is being done is stated underneath the coding in comment form. 
+
+```{r}
+colnames(workouts) <- gsub(' ', '_', colnames(workouts))
+  # puts _ where spaces are within the variable names
+
+
+avg_cal <- ddply(workouts, .(Workout_Day), summarize, 
+                Avg_Calories_Burned = mean(Calories_Burned, na.rm = TRUE))
+  # subset of the data just looking at the workout day and the average calories burned
+    # for each of those workout days
+
+
+```
+
+
+
+```{r}
+
+workouts2 <- workouts[,-c(4:6, length(workouts)-2)]   
+
+```
+
+"workouts2" is a subset of the original data frame "workouts." The coding is removing columns four through six and the column third from last. Columns four through six are being eliminated because they show the number of exercises performed, how many reps and sets were done, respectively. The column third from last is the the column that stores the amount of calories burned when cardio is done. This data frame will be used to depict the progress of average weights (in pounds) used for each exercise in a specific workout day over the weeks. Columns four through six and the calories burned in cardio are not needed for this because the plot will only look at the week, workout day, and each exercise that was performed within the workout day. 
+
+```{r}
+
+workouts.melt <- melt(workouts2, 
+                      id.vars = c('Day', 'Workout_Day', 'Calories_Burned', 'Weight',
+                                  'Week'))
+head(workouts.melt, n = 20)
+
+```
+
+The melt function is converting the data frame "workouts2" into a molten data frame. The melt function is taking the wide format and is stacking each set of columns into one column of data. This is stacking the columns of the exercises into one column.  for example;
+    head(workouts.melt, n = 20) 
+      *prints out the first 20 rows in the dataset "workouts.melt."
+The first 20 rows show that the data is being stacked based on the type of exercised. So it will have all barbell squats in the first couple of rows and then smith machine calf raises, etc. 
+
+
+```{r}
+workouts.final <- workouts.melt[-which(is.na(workouts.melt$value) == TRUE),]
+  # remove na value-ed rows
+head(workouts.final, n = 20)
+  # looks at the first couple rows of the new data.frame
+```
+
+"workouts.final" is the same data frame of "workouts.melt," but without the NA values present. TO compare "workouts.melt" and "workouts.final" the head() command of the first 20 rows is computed.
+
+```{r}
+## for ggplot looking at calories over time
+workouts3 <- workouts2[, -c((length(workouts2)-35):(length(workouts2)-2))]
+workout.cal <- melt(workouts3,
+                      id.vars = c('Day', 'Workout_Day', 'Calories_Burned', 'Weight',
+                                  'Week'))
+head(workout.cal)
+
+```
+
+"workouts3" is a revised data frame of "workouts2." This new data frame takes the columns that are all the exercises performed. So the data set is only considering Day, Week, Workout Day, Calories Burned, and Weight variables. "workouts3" will be used when depicting the average calories burned for each workout day. 
+
+
+### Visuals
+
+There are two plots depicting relationships within the data set of workouts. The function, workout_boxpt, for the boxplot allows the user to place the "x" and "y" values of their choice into the boxplot. For the example of the boxplot it is looking at the average amount of calories burned for each workout day. Everything in the workout_boxpt is generic enough where when the preferred "x" and "y" variables are chosen, the axis and boxplot title will depict those variables properly. 
+
+It is helpful that when creating the boxplot to have "x" as a categorical variable and "y" as numeric. 
+
+
+#### Boxplot
+```{r}
+
+## Boxplot of the avg calories burned for each workout day
+
+workouts::calories_burned_boxpt(workouts, "Workout_Day", "Calories_Burned")
+
+
+
+```
+
+Looking at calories burned for each workout day is desired because there should be a change over time. In each workout day, exercises and the number of exercises are picked at random. The exercises really depend on what I feel like doing that day. So the number of workouts done and the type of exercises will affect the outcome of the total calories burned for that workout day. The variability in calories burned for each workout day is interesting to see because you can see what days I like to favor more than the others. The favored workout day can be seen based on the distribution of the average amount of calories burned for each workout day. 
+
+In terms of the data so far, I like to favor "Leg" day. This is accurate with the boxplot because "Leg" day is my favorite workout day and I usually go more aggressively in those exercises than any other workout day. Thus from going more aggressively in those exercises I burn more calories. The amount of calories burned, like I mentioned above, will change based on the different exercises done for that workout day. I don't like to do the same exercises over and over again, so I will add new workouts into the rotation of exercises. The exercises done in each workout day is really based on how "bored" or "motivated" I am. 
+
+It is also captivating to see the different range of calories burned for each exercise day. As of right now both "Back" and "Leg" workout days are accumulating the most calories burned in a workout session where "Shoulders" don't burn as many calories. In terms of my body that makes sense because my legs and back are actually the strongest parts where my arms are average and my shoulders are the weakest. My back and legs are the strongest due to years of being a catcher in softball, jumper in track and field, and lifting on and off. My arms were stronger during my years of softball and track and field, but my durability has decreased just from lack of endurance on that muscle group. There are actually many reasons why my shoulders are the weakest, but the main reason is because tendinitis and from never working on those muscles during a workout. 
+
+My endurance for each workout day should start to increase which means more weight will be needed or the number of reps will have to increase. This should show a steady increase in calories burned over time and demonstrate a larger distribution of calories burned in each workout day. 
+
+
+
+#### Aesthetics Plot
+
+The function, avg_lbs_day, for the ggplot allows for the user to place the preferred data set and workout day to be used. This function will spit out a plot of the workout day wanted to view the progression of the average weights (lbs) being used in each exercise. The week variable is subtracted by 36 to show the 1st week of workouts rather than the 37th week in the year. 
+
+```{r}
+
+## function allows to plug in whatever workout day wanted to look at and 
+  ## create a graph depicting the workouts done for that day over the weeks
+
+workouts::avg_lbs_day(workouts.final, "Leg") # look at whatever workout day wanted
+
+```
+
+In my point of view, I think the aesthetic plot is the most important depiction of the workouts. It allows me to have a visual of my progress in terms of weight lifting and the overall change in strength of the muscles that are being used in each exercise. There might be drops in the average number of weight with some exercises due to how sore, sick, or rushed I am. I have a lot of problems will my knees that can affect the amount of weight I decide to use. Tendinitis and fluid build-up are the two most concerning problems during leg day, but if they are really bad I lower the weight used so I don't injure myself. It is very important to me to see the overall progress of my workouts because it shows how much I've accomplished.
+
+
+
+```{r, include=FALSE}
+
+## function allows to plug in whatever workout day wanted to look at and 
+  ## create a graph depicting the workouts done for that day over the weeks
+#avg_cal_day <- function(data, b)
+#{
+#  ggplot(aes(x = Week - 36, y = value)) + 
+#    xlab("Week") + ylab("Calories Burned (cal)") +
+#  ggtitle("Calories Burned in Workout Day over time") +
+#    geom_line(aes(col = variable))
+#}
+
+#avg_cal_day(workout.cal, Calories_Burned) # look at whatever workout day wanted
+
+```
+
+
+### Body Fat Calculations
+
+The body_fat function computes the body fat percentage for a person. Body fat percentage is based on six things; weight in pounds, lean body mass, wrist, waist, hip, and forearm circumferences. The lean body mass needs to be computed before calculating the body fat percentage. The body_fat function also does that computation. All that needs to be read into the function is your weight, wrist, waist, hip, and forearm circumferences and the function will do the calculations. When every desired measurement is called into the function, it will print out what your lean body mass and body fat percentages are. 
+
+```{r}
+
+## Bodyfat calculations based on the NAVY body fat calculations
+
+workouts::bodyfat(145, 6.0, 24, 38, 9.5)
+
+
+```
+
+The main focus of this research is calculating my body fat percentage. I want to be able to compare my body fat percentage from the start of working out to my body fat percentage at the end of the semester. It's hard to see the progress in the body weight tracked because there is a good probability that my weight will increase by the end of the semester. This can be because of an increase in fat and/or increase in muscle mass. Muscle weighs more than fat so as I continue to workout, my muscles are getting bigger and hopefully I'm decreasing the fat on my body. At the end of the semester this research will hopefully show that I have decreased my body fat percentage. 
+
+This function allows me to quickly calculate the body fat percentage without having to find an accurate body fat percentage calculator on the internet, buy calpiers, nor do the calculations out by hand. It would be useful to document the body fat percentage after every few weeks and possibly depict that relationship in a plot or table later on. 
+

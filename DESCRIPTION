@@ -1,0 +1,15 @@
+Package: workouts
+Type: Package
+Title: Progression Visualizations for Workouts
+Version: 0.1.0
+Author: Kayla Catalfamo
+Maintainer: The package maintainer <Kayla_Catalfamo@URMC.rochester.edu>
+Description: There are two plot functions depicting relationships within the data set of workouts. The boxplot it is looking at the average amount of calories burned for each workout day and the aesthetics plot visualizes the average amount of weights used for each exercise specifically in a workout day. There is also a function available that calculates the lean body mass and body fat percentage for a woman. 
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Import: ggplot2
+Suggests: knitr,
+    rmarkdown, devtools, googlesheets, plyr, reshape2, tidyverse
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1
