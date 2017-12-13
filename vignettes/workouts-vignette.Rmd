@@ -3,8 +3,8 @@ title: "Workouts"
 author: "Kayla Catalfamo"
 date: '`r Sys.Date()`'
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 vignette: |
   %\VignetteIndexEntry{Vignette Title} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
@@ -153,11 +153,11 @@ workouts::calories_burned_boxpt(workouts, "Workout_Day", "Calories_Burned")
 
 Looking at calories burned for each workout day is desired because there should be a change over time. In each workout day, exercises and the number of exercises are picked at random. The exercises really depend on what I feel like doing that day. So the number of workouts done and the type of exercises will affect the outcome of the total calories burned for that workout day. The variability in calories burned for each workout day is interesting to see because you can see what days I like to favor more than the others. The favored workout day can be seen based on the distribution of the average amount of calories burned for each workout day. 
 
-In terms of the data so far, I like to favor "Leg" day. This is accurate with the boxplot because "Leg" day is my favorite workout day and I usually go more aggressively in those exercises than any other workout day. Thus from going more aggressively in those exercises I burn more calories. The amount of calories burned, like I mentioned above, will change based on the different exercises done for that workout day. I don't like to do the same exercises over and over again, so I will add new workouts into the rotation of exercises. The exercises done in each workout day is really based on how "bored" or "motivated" I am. 
+In terms of the data, I like to favor "Leg" day. This is accurate with the boxplot because "Leg" day is my favorite workout day and I usually go more aggressively in those exercises than any other workout day. Thus from going more aggressively in those exercises I burn more calories. The amount of calories burned, like I mentioned above, will change based on the different exercises done for that workout day. I don't like to do the same exercises over and over again, so I will add new workouts into the rotation of exercises. The exercises done in each workout day is really based on how "bored," "motivated," or "frustrated" I am. 
 
-It is also captivating to see the different range of calories burned for each exercise day. As of right now both "Back" and "Leg" workout days are accumulating the most calories burned in a workout session where "Shoulders" don't burn as many calories. In terms of my body that makes sense because my legs and back are actually the strongest parts where my arms are average and my shoulders are the weakest. My back and legs are the strongest due to years of being a catcher in softball, jumper in track and field, and lifting on and off. My arms were stronger during my years of softball and track and field, but my durability has decreased just from lack of endurance on that muscle group. There are actually many reasons why my shoulders are the weakest, but the main reason is because tendinitis and from never working on those muscles during a workout. 
+It is also captivating to see the different range of calories burned for each exercise day. As of right now both "Back" and "Leg" workout days are accumulating the most calories burned in a workout session where "Cardio" and "Shoulders" don't burn as many calories. In terms of my body that makes sense because my legs and back are actually the strongest parts where my arms are average and my shoulders are the weakest. My back and legs are the strongest due to years of being a catcher in softball, jumper in track and field, and lifting on and off. My arms were stronger during my years of softball and track and field, but my durability has decreased just from lack of endurance on that muscle group. Cardio also has a low distribution of calories because I haven't been doing just Cardio days and when I do I only go for a half hour to an hour. I need to get back into the rhythm of running and going a little at a time will help. I also have to be respectful to my knee when running because once I fell off my horse in Equestrian club it fills up with fluid with high impact. There are actually many reasons why my shoulders are the weakest, but the main reason is because tendinitis and from never working on those muscles during a workout. 
 
-My endurance for each workout day should start to increase which means more weight will be needed or the number of reps will have to increase. This should show a steady increase in calories burned over time and demonstrate a larger distribution of calories burned in each workout day. 
+My endurance for each workout day has and will continue to increase which is shown by the amount of weight being needed or the number of reps will have to increase. I haven't increased the number of reps mainly because I like having the same amount done for each exercise. It made more sense to keep increasing the amount of weight being used. This shows a steady increase in calories burned over time and demonstrates a larger distribution of calories burned in each workout day. 
 
 
 
@@ -201,14 +201,16 @@ The body_fat function computes the body fat percentage for a person. Body fat pe
 
 ```{r}
 
-## Bodyfat calculations based on the NAVY body fat calculations
+## Bodyfat calculations based on the NAVY body fat calculations beginning of semester
 
-workouts::bodyfat(145, 6.0, 24, 38, 9.5)
+workouts::bodyfat(150, 4.5, 28, 38, 9.0)
 
+## Bodyfat caculation based on the NAVY body fat calculatons at the end of the semester
+workouts::bodyfat(148, 4.5, 30.5, 42, 10.5)
 
 ```
 
 The main focus of this research is calculating my body fat percentage. I want to be able to compare my body fat percentage from the start of working out to my body fat percentage at the end of the semester. It's hard to see the progress in the body weight tracked because there is a good probability that my weight will increase by the end of the semester. This can be because of an increase in fat and/or increase in muscle mass. Muscle weighs more than fat so as I continue to workout, my muscles are getting bigger and hopefully I'm decreasing the fat on my body. At the end of the semester this research will hopefully show that I have decreased my body fat percentage. 
 
-This function allows me to quickly calculate the body fat percentage without having to find an accurate body fat percentage calculator on the internet, buy calpiers, nor do the calculations out by hand. It would be useful to document the body fat percentage after every few weeks and possibly depict that relationship in a plot or table later on. 
+This function allows me to quickly calculate the body fat percentage without having to find an accurate body fat percentage calculator on the internet, buy calpiers, nor do the calculations out by hand. From measurements taken at the end of the semester, the function indicates that my body fat percentage has increased by decimals. This is one bad thing about calculating body fat percentage by hand. There is human error involved and doesn't take into consideration water weight or muscle weight. 
 

@@ -36,7 +36,8 @@ calories_burned_boxpt <- function(data,x,y){
          ggtitle(paste(gsub("_"," ", y), "vs", gsub("_", " ", x))) +
 
       scale_color_manual(values=c("black", "magenta3", "dodgerblue2",
-                               "seagreen4", "firebrick1")) +
-      scale_fill_manual(values = c("gray76","gray76","gray76","gray76","gray76"))
+                               "seagreen4", "firebrick1", "darkorange2")) +
+      scale_fill_manual(values = c("gray76","gray76","gray76","gray76","gray76",
+                                   "gray76"))
 }
 
